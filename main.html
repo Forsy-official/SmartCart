@@ -249,7 +249,6 @@
         // Вызов фильтрации по поисковому запросу
         function executeSearch() {
             currentQuery = document.getElementById('productSearch').value;
-
             applyFilters();
         }
 
@@ -269,6 +268,8 @@
             for (let i = 0; i <= b.length; i++) {
                 matrix[i] = [i];
             }
+
+            // Заполнение первой строки двумерного массива
             for (let j = 0; j <= a.length; j++) {
                 matrix[0][j] = j;
             }
@@ -289,10 +290,16 @@
             return matrix[b.length][a.length];
         }
 
-        // Функция нечеткого сравнения строк
+        // Функция нечеткого сравнения строк с защитой от уязвимостей и инъекций тегов
         function isFuzzyMatch(target, query) {
+            // Удаляем любые HTML-теги и угловые скобки из инпута, чтобы избежать XSS поломок
+            query = query.replace(/<[^>]*>/g, '').replace(/[<>]/g, '');
+
             target = target.toLowerCase().trim();
             query = query.toLowerCase().trim();
+
+            // Если после фильтрации запрос стал пустым, показываем все товары
+            if (!query) return true;
 
             // Если подстрока входит целиком — это 100% совпадение
             if (target.includes(query)) return true;
